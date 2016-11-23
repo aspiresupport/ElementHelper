@@ -14,12 +14,12 @@ class ElementHelper
     }
 
     /**
-     * Creates categories from an array of category names. Each category is 
-     * the parent of the following category. The last category in the tree 
+     * Creates categories from an array of category names. Each category is
+     * the parent of the following category. The last category in the tree
      * is returned.
-     * 
+     *
      * @param array $categories
-     * 
+     *
      * @return Element | boolean
      */
     private function create_category_tree($categories)
@@ -41,10 +41,10 @@ class ElementHelper
 
     /**
      * Creates and returns a category object
-     * 
+     *
      * @param string $name
      * @param int $parent_id
-     * 
+     *
      * @return Element | boolean
      */
     private function create_category($name, $parent_id = 0)
@@ -71,9 +71,9 @@ class ElementHelper
     /**
      * Returns a category tree as a forward-slash delimited path. Used to
      * create file paths when making an element static.
-     * 
+     *
      * @param integer $id
-     * 
+     *
      * @return string
      */
     private function get_category_tree_path($id)
@@ -96,9 +96,9 @@ class ElementHelper
 
     /**
      * Gets the meta information for a file element e.g. description
-     * 
+     *
      * @param string $file_content
-     * 
+     *
      * @return array
      */
     private function get_file_element_meta($file_content)
@@ -109,13 +109,17 @@ class ElementHelper
         foreach ($comments as $comment)
         {
             $comment_lines = explode("\n", $comment);
-            
+
             foreach($comment_lines as $comment_line)
             {
                 if (preg_match('/@Description (.*)/', $comment_line, $match))
                 {
                     $meta['description'] = trim($match[1]);
                 }
+                if (preg_match('/@Icon (.*)/', $comment_line, $match))
+    +           {
+    +               $meta['icon'] = trim($match[1]);
+    +           }
             }
         }
 
@@ -125,10 +129,10 @@ class ElementHelper
     /**
      * Gets and returns the properties for a file to be saved into an
      * element
-     * 
+     *
      * @param string $type_path
      * @param string $path
-     * 
+     *
      * @return array
      */
     public function get_file_element_properties($type_path, $path)
@@ -146,25 +150,26 @@ class ElementHelper
         }
 
         $properties = array(
-            'source' => 1,
-            'static' => 1,
+            'source'      => 1,
+            'static'      => 1,
             'static_file' => str_replace(MODX_BASE_PATH, '', $path),
             'description' => (isset($meta['description']) ? $meta['description'] : ''),
-            'content' => $content,
-            'category' => (isset($category) ? $category->get_property('id') : null)
+            'content'     => $content,
+            'category'    => (isset($category) ? $category->get_property('id') : null),
+            'icon'        => (isset($meta['icon']) ? $meta['icon'] : '')
         );
 
         return $properties;
     }
 
     /**
-     * Builds the file path for an element 
-     * 
+     * Builds the file path for an element
+     *
      * @param string $type
      * @param string $type_path
      * @param string $name
      * @param string $category
-     * 
+     *
      * @return string
      */
     public function build_element_file_path($type, $type_path, $name, $category)
@@ -180,11 +185,11 @@ class ElementHelper
     /**
      * Creates a doc comment for element meta to be appended to the top of
      * an elements file.
-     * 
+     *
      * @todo See if there's a better way to do this
-     * 
+     *
      * @param array $meta
-     * 
+     *
      * @return string
      */
     private function build_meta_doc_comment($meta)
@@ -203,12 +208,12 @@ class ElementHelper
 
     /**
      * Gets the the properties of an element for it's static file
-     * 
+     *
      * @todo maybe change the name of this
-     * 
+     *
      * @param Element $element
      * @param string $path
-     * 
+     *
      * @return array
      */
     public function get_element_static_file_properties($element, $path)
@@ -232,12 +237,12 @@ class ElementHelper
 
     /**
      * Gets the properties for a template variable
-     * 
+     *
      * @todo map weird named properties to more sensible ones e.g. input option values is elements
      * @todo allow processing of additional values for properties like "display" e.g. when it's a url (related to output_properties?)
-     * 
+     *
      * @param object $tv
-     * 
+     *
      * @return array
      */
     public function get_tv_element_properties($tv)
@@ -340,10 +345,10 @@ class ElementHelper
 
     /**
      * Sets up all template access for a template variable
-     * 
+     *
      * @param integer $tv_id
      * @param array $templates
-     * 
+     *
      * @return boolean
      */
     public function setup_tv_template_access($tv_id, $templates)
@@ -399,10 +404,10 @@ class ElementHelper
 
     /**
      * Adds template access to a template variable
-     * 
+     *
      * @param integer $tv_id
      * @param integer $template_id
-     * 
+     *
      * @return boolean
      */
     private function add_template_access($tv_id, $template_id)
@@ -431,16 +436,16 @@ class ElementHelper
 
     /**
      * Removes template access from a template variable
-     * 
+     *
      * @param integer $tv_id
      * @param integer $template_id
-     * 
+     *
      * @return boolean
      */
     private function remove_template_access($tv_id, $template_id)
     {
         $tv_template = $this->modx->getObject('modTemplateVarTemplate', array(
-            'tmplvarid' => $tv_id, 
+            'tmplvarid' => $tv_id,
             'templateid' => $template_id
         ));
 
@@ -457,15 +462,15 @@ class ElementHelper
 
     /**
      * Updates the template variables file
-     * 
+     *
      * @param array $tvs
-     * 
+     *
      * @return boolean
      */
     public function update_tv_file($tvs)
     {
         $tv_file_path = MODX_BASE_PATH . $this->modx->getOption('elementhelper.tv_file_path', null, 'site/elements/template_variables.json');
-    
+
         if (defined('JSON_PRETTY_PRINT'))
         {
             $tv_json = json_encode($tvs, JSON_PRETTY_PRINT);
@@ -474,7 +479,7 @@ class ElementHelper
         {
             $tv_json = $this->pretty_json(json_encode($tvs));
         }
-        
+
         if ( ! file_put_contents($tv_file_path, $tv_json))
         {
             return false;
@@ -485,13 +490,13 @@ class ElementHelper
 
     /**
      * https://gist.github.com/odan/7a04c02dbce59217a33c
-     * 
+     *
      * json_encode in PHP versions below 5.4 can't output neatly spaced
      * json so we use this when writing back to the template variables file
-     * 
+     *
      * @param string $json Original JSON string
      * @param array $options Encoding options
-     * 
+     *
      * @return string
      */
     public function pretty_json($json, $options = array())
@@ -550,7 +555,7 @@ class ElementHelper
                 $result .= ( $inLiteral ? '' : $prefix ) . $token;
 
                 // Count # of unescaped double-quotes in token, subtract # of
-                // escaped double-quotes and if the result is odd then we are 
+                // escaped double-quotes and if the result is odd then we are
                 // inside a string literal
                 if ((substr_count($token, "\"") - substr_count($token, "\\\"")) % 2 != 0) {
                     $inLiteral = !$inLiteral;
