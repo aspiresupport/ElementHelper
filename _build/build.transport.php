@@ -11,7 +11,7 @@ require_once MODX_CORE_PATH . 'model/modx/modx.class.php';
 define('PKG_NAME', 'ElementHelper');
 define('PKG_NAME_LOWER', 'elementhelper');
 define('PKG_VERSION', '2.0.0');
-define('PKG_RELEASE', 'alpha-3');
+define('PKG_RELEASE', 'alpha-4');
 
 $root = dirname(dirname(__FILE__)) . '/';
 
@@ -37,9 +37,9 @@ $modx->loadClass('transport.modPackageBuilder', '', false, true);
 $builder = new modPackageBuilder($modx);
 $builder->createPackage(PKG_NAME_LOWER, PKG_VERSION, PKG_RELEASE);
 $builder->registerNamespace(
-    PKG_NAME_LOWER, 
-    false, 
-    true, 
+    PKG_NAME_LOWER,
+    false,
+    true,
     '{core_path}components/' . PKG_NAME_LOWER . '/'
 );
 
@@ -137,7 +137,7 @@ $builder->setPackageAttributes(array(
 $modx->log(modX::LOG_LEVEL_INFO, 'Packing up transport package zip...'); flush();
 
 $builder->pack();
- 
+
 $tend= explode(" ", microtime());
 $tend= $tend[1] + $tend[0];
 $totalTime= sprintf("%2.4f s", ($tend - $tstart));

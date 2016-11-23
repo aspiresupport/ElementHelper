@@ -1,4 +1,11 @@
 ====================
+Version 2.0.0 alpha 4
+====================
+
+- Add support for icons in the docblock
+- Add Delete TV setting to prevent template variables from being removed when removed from the TV file, this prevents typos from removing all TVs by accident
+
+====================
 Version 2.0.0
 ====================
 

@@ -92,4 +92,13 @@ $settings['elementhelper.element_blacklist']->fromArray(array(
     'area' => 'config'
 ), '', true, true);
 
+$settings['elementhelper.delete_tvs'] = $modx->newObject('modSystemSetting');
+$settings['elementhelper.delete_tvs']->fromArray(array(
+    'key' => 'elementhelper.delete_tvs',
+    'value' => '0',
+    'xtype' => 'combo-boolean',
+    'namespace' => 'elementhelper',
+    'area' => 'config'
+), '', true, true);
+
 return $settings;

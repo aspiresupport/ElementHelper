@@ -1,10 +1,11 @@
 <?php
 $default_core_path = $modx->getOption('core_path') . 'components/elementhelper/';
-$core_path = $modx->getOption('elementhelper.core_path', null, $default_core_path);
+$core_path         = $modx->getOption('elementhelper.core_path', null, $default_core_path);
+$delete_tvs        = $modx->getOption('elementhelper.delete_tvs', null, 0);
 
 $usergroups = explode(',', $modx->getOption('elementhelper.usergroups', null, 'Administrator'));
 
-// Return if the user isn't part of one of the allowed usergroups 
+// Return if the user isn't part of one of the allowed usergroups
 if ( ! $modx->user->isMember($usergroups))
 {
     return;
@@ -134,7 +135,7 @@ foreach ($element_types as $type => $type_path)
         if ( ! file_exists($file_path))
         {
             // If the element is not in the sync
-            if ( ! $element_sync->has_element($type, $name))    
+            if ( ! $element_sync->has_element($type, $name))
             {
                 $properties = $element_helper->get_element_static_file_properties($element, $file_path);
 
@@ -163,8 +164,8 @@ if (file_exists($tv_file_path))
 {
     $tv_file_contents = file_get_contents($tv_file_path);
     $tv_file_mod_time = filemtime($tv_file_path);
-    $tvs = ($tv_file_contents !== '' ? json_decode($tv_file_contents) : array());
-    $flagged_tvs = array();
+    $tvs              = ($tv_file_contents !== '' ? json_decode($tv_file_contents) : array());
+    $flagged_tvs      = array();
 
     // Loop through the template variables in the file
     foreach ($tvs as $i => $tv)
@@ -180,7 +181,7 @@ if (file_exists($tv_file_path))
                 // Create the element
                 $element = Element::create($modx, 'modTemplateVar', $tv->name);
 
-                // If the element is created successfully 
+                // If the element is created successfully
                 if ($element)
                 {
                     $properties = $element_helper->get_tv_element_properties($tv);
@@ -215,7 +216,8 @@ if (file_exists($tv_file_path))
             if ( ! $element)
             {
                 // Flag the tv for removal after we've checked all tvs in the file
-                $flagged_tvs[] = $i;
+                // Only flag if the setting for removal is true
+                if(!empty($delete_tvs)) $flagged_tvs[] = $i;
             }
             else
             {
