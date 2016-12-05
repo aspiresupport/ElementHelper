@@ -2,6 +2,42 @@
 
 $settings = array();
 
+$settings['elementhelper.sync_modChunk'] = $modx->newObject('modSystemSetting');
+$settings['elementhelper.sync_modChunk']->fromArray(array(
+    'key' => 'elementhelper.sync_modChunk',
+    'value' => '1',
+    'xtype' => 'combo-boolean',
+    'namespace' => 'elementhelper',
+    'area' => 'config'
+), '', true, true);
+
+$settings['elementhelper.sync_modTemplate'] = $modx->newObject('modSystemSetting');
+$settings['elementhelper.sync_modTemplate']->fromArray(array(
+    'key' => 'elementhelper.sync_modTemplate',
+    'value' => '1',
+    'xtype' => 'combo-boolean',
+    'namespace' => 'elementhelper',
+    'area' => 'config'
+), '', true, true);
+
+$settings['elementhelper.sync_modPlugin'] = $modx->newObject('modSystemSetting');
+$settings['elementhelper.sync_modPlugin']->fromArray(array(
+    'key' => 'elementhelper.sync_modPlugin',
+    'value' => '1',
+    'xtype' => 'combo-boolean',
+    'namespace' => 'elementhelper',
+    'area' => 'config'
+), '', true, true);
+
+$settings['elementhelper.sync_modSnippet'] = $modx->newObject('modSystemSetting');
+$settings['elementhelper.sync_modSnippet']->fromArray(array(
+    'key' => 'elementhelper.sync_modSnippet',
+    'value' => '1',
+    'xtype' => 'combo-boolean',
+    'namespace' => 'elementhelper',
+    'area' => 'config'
+), '', true, true);
+
 $settings['elementhelper.chunk_path'] = $modx->newObject('modSystemSetting');
 $settings['elementhelper.chunk_path']->fromArray(array(
     'key' => 'elementhelper.chunk_path',

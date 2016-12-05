@@ -117,9 +117,9 @@ class ElementHelper
                     $meta['description'] = trim($match[1]);
                 }
                 if (preg_match('/@Icon (.*)/', $comment_line, $match))
-    +           {
-    +               $meta['icon'] = trim($match[1]);
-    +           }
+                {
+                    $meta['icon'] = trim($match[1]);
+                }
             }
         }
 

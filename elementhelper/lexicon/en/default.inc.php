@@ -1,5 +1,22 @@
 <?php
 
+
+$_lang['setting_elementhelper.delete_tvs'] = 'Delete TVs';
+$_lang['setting_elementhelper.delete_tvs_desc'] = 'Delete Template Variables from the site when removed from the TV file.';
+
+$_lang['setting_elementhelper.sync_modChunk'] = 'Sync Chunks';
+$_lang['setting_elementhelper.sync_modChunk_desc'] = '.';
+
+$_lang['setting_elementhelper.sync_modTemplate'] = 'Sync Templates';
+$_lang['setting_elementhelper.sync_modTemplate_desc'] = '';
+
+$_lang['setting_elementhelper.sync_modPlugin'] = 'Sync Plugins';
+$_lang['setting_elementhelper.sync_modPlugin_desc'] = '';
+
+$_lang['setting_elementhelper.sync_modSnippets'] = 'Sync Snippets';
+$_lang['setting_elementhelper.sync_modSnippets_desc'] = '';
+
+
 $_lang['setting_elementhelper.chunk_path'] = 'Chunk Path';
 $_lang['setting_elementhelper.chunk_path_desc'] = 'The path to your chunk directory.';
 

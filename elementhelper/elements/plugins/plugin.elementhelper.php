@@ -2,6 +2,10 @@
 $default_core_path = $modx->getOption('core_path') . 'components/elementhelper/';
 $core_path         = $modx->getOption('elementhelper.core_path', null, $default_core_path);
 $delete_tvs        = $modx->getOption('elementhelper.delete_tvs', null, 0);
+$sync_modChunk    = $modx->getOption('elementhelper.sync_modChunk', null, 0);
+$sync_modTemplate = $modx->getOption('elementhelper.sync_modTemplate', null, 0);
+$sync_modPlugin   = $modx->getOption('elementhelper.sync_modPlugin', null, 0);
+$sync_modSnippet  = $modx->getOption('elementhelper.sync_modSnippet', null, 0);
 
 $usergroups = explode(',', $modx->getOption('elementhelper.usergroups', null, 'Administrator'));
 
@@ -22,168 +26,189 @@ $element_sync_file = MODX_BASE_PATH . $modx->getOption('elementhelper.element_sy
 
 // Initialize the classes
 $element_helper = new ElementHelper($modx);
-$element_sync = new ElementSync($modx, $element_sync_file);
+$element_sync   = new ElementSync($modx, $element_sync_file);
 
 $element_types = array(
     'modTemplate' => $modx->getOption('elementhelper.template_path', null, 'site/elements/templates/'),
-    'modChunk' => $modx->getOption('elementhelper.chunk_path', null, 'site/elements/chunks/'),
-    'modSnippet' => $modx->getOption('elementhelper.snippet_path', null, 'site/elements/snippets/'),
-    'modPlugin' => $modx->getOption('elementhelper.plugin_path', null, 'site/elements/plugins/')
+    'modChunk'    => $modx->getOption('elementhelper.chunk_path', null, 'site/elements/chunks/'),
+    'modSnippet'  => $modx->getOption('elementhelper.snippet_path', null, 'site/elements/snippets/'),
+    'modPlugin'   => $modx->getOption('elementhelper.plugin_path', null, 'site/elements/plugins/')
 );
 
 $category_whitelist = array_map('trim', explode(',', $modx->getOption('elementhelper.category_whitelist', null, '')));
-$element_blacklist = array_map('trim', explode(',', $modx->getOption('elementhelper.element_blacklist', null, '')));
+$element_blacklist  = array_map('trim', explode(',', $modx->getOption('elementhelper.element_blacklist', null, '')));
+
 
 // Loop through the element types
 foreach ($element_types as $type => $type_path)
 {
-    $log_prefix = sprintf('[ElementHelper] %s: ', $type);
-    $file_list = FileHelper::get_directory_file_list(MODX_BASE_PATH . $type_path);
 
-    // Move onto the next element type if it has no files
-    if (empty($file_list))
-    {
-        $modx->log(MODX_LOG_LEVEL_INFO, $log_prefix . 'No files.');
+    // Only process if the element sync setting is true
+    if( !empty(${"sync_$type"}) ) :
 
-        continue;
-    }
+        echo 'Sync '. ${"sync_$type"};
 
-    // Process the files for this element type
-    foreach ($file_list as $file_path)
-    {
-        $file = FileHelper::get_file_meta($file_path);
-        $element = Element::get($modx, $type, $file['name']);
+        $log_prefix = sprintf('[ElementHelper] %s: ', $type);
+        $file_list = FileHelper::get_directory_file_list(MODX_BASE_PATH . $type_path);
 
-        // If the file is not in the sync
-        if ( ! $element_sync->has_element($type, $file['name']))
+        // Move onto the next element type if it has no files
+        if (empty($file_list))
         {
-            // If the element doesn't exist
-            if ( ! $element)
-            {
-                // Create the element
-                $element = Element::create($modx, $type, $file['name']);
+            $modx->log(MODX_LOG_LEVEL_INFO, $log_prefix . 'No files.');
 
-                // If the element is created successfully set it's properties and then add it to the sync
-                if ($element)
-                {
-                    $properties = $element_helper->get_file_element_properties($type_path, $file_path);
-
-                    if ($element->set_properties($properties))
-                    {
-                        $element_sync->add_element($type, $file['name'], $file['mod_time']);
-                    }
-                }
-            }
-            else
-            {
-                $modx->log(MODX_LOG_LEVEL_INFO, $log_prefix . 'An element with the name [' . $file['name'] . '] already exists. Unable to sync the file and element.');
-            }
-        }
-        else
-        {
-            // If the element doesn't exist
-            if ( ! $element)
-            {
-                // Delete the file and remove it from the sync if successful
-                if (unlink($file_path))
-                {
-                    $element_sync->remove_element($type, $file['name']);
-                }
-            }
-            else
-            {
-                // If file has been updated, update the element and sync
-                if ($file['mod_time'] > $element_sync->get_element_mod_time($type, $file['name']))
-                {
-                    $properties = $element_helper->get_file_element_properties($type_path, $file_path);
-
-                    if ($element->set_properties($properties))
-                    {
-                        $element_sync->add_element($type, $file['name'], $file['mod_time']);
-                    }
-                }
-            }
-        }
-    }
-
-    // Process the elements for this element type
-    foreach ($modx->getCollection($type) as $element_object)
-    {
-        $element = Element::insert($element_object);
-        $name = $element->get_property('name');
-        $category_id = $element->get_property('category');
-        $file_path = $element_helper->build_element_file_path($type, $type_path, $name, $category_id);
-
-        // Check if the element is blacklisted
-        if (in_array($name, $element_blacklist))
-        {
             continue;
         }
 
-        // Check if the element has a category and is whitelisted
-        if ($category_id !== 0)
+        // Process the files for this element type
+        foreach ($file_list as $file_path)
         {
-            $category = Element::get($modx, 'modCategory', $category_id);
+            $file = FileHelper::get_file_meta($file_path);
+            $element = Element::get($modx, $type, $file['name']);
 
-            if ( ! in_array($category->get_property('name'), $category_whitelist))
+            // If the file is not in the sync
+            if ( ! $element_sync->has_element($type, $file['name']))
             {
-                continue;
-            }
-        }
-
-        // If a file with this element name doesn't exist
-        if ( ! file_exists($file_path))
-        {
-            // If the element is not in the sync
-            if ( ! $element_sync->has_element($type, $name))
-            {
-                $properties = $element_helper->get_element_static_file_properties($element, $file_path);
-
-                if ($element->set_properties($properties))
+                // If the element doesn't exist
+                if ( ! $element)
                 {
-                    $file_mod_time = filemtime($file_path);
-                    $element_sync->add_element($type, $name, $file_mod_time);
+                    // Create the element
+                    $element = Element::create($modx, $type, $file['name']);
+
+                    // If the element is created successfully set it's properties and then add it to the sync
+                    if ($element)
+                    {
+                        $properties = $element_helper->get_file_element_properties($type_path, $file_path);
+
+                        if ($element->set_properties($properties))
+                        {
+                            $element_sync->add_element($type, $file['name'], $file['mod_time']);
+                        }
+                    }
+                }
+                else
+                {
+                    $modx->log(MODX_LOG_LEVEL_INFO, $log_prefix . 'An element with the name [' . $file['name'] . '] already exists. Unable to sync the file and element.');
                 }
             }
             else
             {
-                // Remove the element and remove it from the sync if successful
-                if ($element->remove())
+                // If the element doesn't exist
+                if ( ! $element)
                 {
-                    $element_sync->remove_element($type, $name);
+                    // Delete the file and remove it from the sync if successful
+                    if (unlink($file_path))
+                    {
+                        $element_sync->remove_element($type, $file['name']);
+                    }
+                }
+                else
+                {
+                    // If file has been updated, update the element and sync
+                    if ($file['mod_time'] > $element_sync->get_element_mod_time($type, $file['name']))
+                    {
+                        $properties = $element_helper->get_file_element_properties($type_path, $file_path);
+
+                        if ($element->set_properties($properties))
+                        {
+                            $element_sync->add_element($type, $file['name'], $file['mod_time']);
+                        }
+                    }
                 }
             }
         }
-    }
+
+        // Process the elements for this element type
+        foreach ($modx->getCollection($type) as $element_object)
+        {
+            $element = Element::insert($element_object);
+            $name = $element->get_property('name');
+            $category_id = $element->get_property('category');
+            $file_path = $element_helper->build_element_file_path($type, $type_path, $name, $category_id);
+
+            // Check if the element is blacklisted
+            if (in_array($name, $element_blacklist))
+            {
+                continue;
+            }
+
+            // Check if the element has a category and is whitelisted
+            if ($category_id !== 0)
+            {
+                $category = Element::get($modx, 'modCategory', $category_id);
+
+                if ( ! in_array($category->get_property('name'), $category_whitelist))
+                {
+                    continue;
+                }
+            }
+
+            // If a file with this element name doesn't exist
+            if ( ! file_exists($file_path))
+            {
+                // If the element is not in the sync
+                if ( ! $element_sync->has_element($type, $name))
+                {
+                    $properties = $element_helper->get_element_static_file_properties($element, $file_path);
+
+                    if ($element->set_properties($properties))
+                    {
+                        $file_mod_time = filemtime($file_path);
+                        $element_sync->add_element($type, $name, $file_mod_time);
+                    }
+                }
+                else
+                {
+                    // Remove the element and remove it from the sync if successful
+                    if ($element->remove())
+                    {
+                        $element_sync->remove_element($type, $name);
+                    }
+                }
+            }
+        }
+
+
+    endif ;
 }
 
 $log_prefix = '[ElementHelper] modTemplateVar: ';
 $tv_file_path = MODX_BASE_PATH . $modx->getOption('elementhelper.tv_file_path', null, 'site/elements/template_variables.json');
 
+// var_dump(file_exists($tv_file_path));
+
 if (file_exists($tv_file_path))
 {
     $tv_file_contents = file_get_contents($tv_file_path);
     $tv_file_mod_time = filemtime($tv_file_path);
+    // Get an array of TVs in the json file
     $tvs              = ($tv_file_contents !== '' ? json_decode($tv_file_contents) : array());
     $flagged_tvs      = array();
 
-    // Loop through the template variables in the file
+     // var_dump($tv_file_contents);
+     // var_dump($tv_file_mod_time);
+     // var_dump($tvs);
+
+         // Loop through the template variables in the file
     foreach ($tvs as $i => $tv)
     {
+        // var_dump($tv->name);
+
+        // Get the current template variable from MODX
         $element = Element::get($modx, 'modTemplateVar', $tv->name);
 
-        // If the element is not in the sync
+        // If the element is not in the element sync file ...
         if ( ! $element_sync->has_element('modTemplateVar', $tv->name))
         {
-            // If the tv doesn't exist
+            // ... and the tv doesn't exist in MODX
             if ( ! $element)
             {
-                // Create the element
+                // Create the element in MODX
                 $element = Element::create($modx, 'modTemplateVar', $tv->name);
 
                 // If the element is created successfully
                 if ($element)
                 {
+                    // Get the properties from MODX to save to our template json file
                     $properties = $element_helper->get_tv_element_properties($tv);
 
                     // If templates have been specified and permission to pair tvs with templates has been given
@@ -221,35 +246,42 @@ if (file_exists($tv_file_path))
             }
             else
             {
+
                 // If the template variable file has been updated update the tv element and sync
                 if ($tv_file_mod_time > $element_sync->get_element_mod_time('modTemplateVar', $tv->name))
                 {
-                    $properties = $element_helper->get_tv_element_properties($tv);
 
-                    // If templates have been specified and permission to pair tvs with templates has been given
-                    if (isset($tv->template_access) && $modx->getOption('elementhelper.tv_access_control', null, false) == true)
-                    {
-                        $element_helper->setup_tv_template_access($element->get_property('id'), $tv->template_access);
-                    }
+                    //if($tv->name == 'PreviewImage') :
+                      //  var_dump($tv->name);
+                        $properties = $element_helper->get_tv_element_properties($tv);
 
-                    // If a media source has been specified assign it to the TV
-                    if (isset($tv->media_source))
-                    {
-                        $element_helper->setup_tv_media_source($element->get_property('id'), $tv->media_source);
-                    }
+                        // var_dump($properties);
 
-                    // Set the tv properties and then add it to the sync
-                    if ($element->set_properties($properties))
-                    {
-                        $element_sync->add_element('modTemplateVar', $tv->name, $tv_file_mod_time);
-                    }
+                        // If templates have been specified and permission to pair tvs with templates has been given
+                        if (isset($tv->template_access) && $modx->getOption('elementhelper.tv_access_control', null, false) == true)
+                        {
+                            $element_helper->setup_tv_template_access($element->get_property('id'), $tv->template_access);
+                        }
+
+                        // If a media source has been specified assign it to the TV
+                        if (isset($tv->media_source))
+                        {
+                            $element_helper->setup_tv_media_source($element->get_property('id'), $tv->media_source);
+                        }
+
+                        // Set the tv properties and then add it to the sync
+                        if ($element->set_properties($properties))
+                        {
+                            $element_sync->add_element('modTemplateVar', $tv->name, $tv_file_mod_time);
+                        }
+                   // endif;
                 }
             }
         }
     }
 
     // Remove any flagged tvs
-    if (count($flagged_tvs) > 0)
+    if ( count($flagged_tvs) > 0 )
     {
         $updated_tvs = $tvs;
 
@@ -268,14 +300,19 @@ if (file_exists($tv_file_path))
         }
     }
 
+
+    //var_dump($element_object);
+
     // Process the template variable elements
     foreach ($modx->getCollection('modTemplateVar') as $element_object)
     {
         // Check if the tv exists in the template variables file
-        $element = Element::insert($element_object);
-        $name = $element->get_property('name');
-        $category_id = $element->get_property('category');
+        $element        = Element::insert($element_object);
+        $name           = $element->get_property('name');
+        $category_id    = $element->get_property('category');
         $tv_file_has_tv = false;
+
+        // var_dump($name);
 
         // Check if the element has a category and is whitelisted
         if ($category_id !== 0)
@@ -300,23 +337,26 @@ if (file_exists($tv_file_path))
         // If the tv doesn't exist in the template variables json file
         if ($tv_file_has_tv === false)
         {
-            // If the element is not in the sync
+
+            //var_dump($name);
+
+            // If the element is not in the element sync file lets add it
             if ( ! $element_sync->has_element('modTemplateVar', $name))
             {
                 // Collect the tv element properties
                 $new_tv= array(array(
-                    'name' => $name,
-                    'caption' => $element->get_property('caption'),
-                    'type' => $element->get_property('type'),
-                    'description' => $element->get_property('description'),
-                    'category' => ($element->get_property('category') !== 0 ? $element->get_property('category') : null),
-                    'locked' => $element->get_property('locked'),
-                    'elements' => $element->get_property('elements'),
-                    'rank' => $element->get_property('rank'),
-                    'display' => $element->get_property('display'),
-                    'default_text' => $element->get_property('default_text'),
-                    'properties' => $element->get_property('properties'),
-                    'input_properties' => $element->get_property('input_properties'),
+                    'name'              => $name,
+                    'caption'           => $element->get_property('caption'),
+                    'type'              => $element->get_property('type'),
+                    'description'       => $element->get_property('description'),
+                    'category'          => ($element->get_property('category') !== 0 ? $element->get_property('category') : null),
+                    'locked'            => $element->get_property('locked'),
+                    'elements'          => $element->get_property('elements'),
+                    'rank'              => $element->get_property('rank'),
+                    'display'           => $element->get_property('display'),
+                    'default_text'      => $element->get_property('default_text'),
+                    'properties'        => $element->get_property('properties'),
+                    'input_properties'  => $element->get_property('input_properties'),
                     'output_properties' => $element->get_property('output_properties')
                 ));
 
@@ -338,12 +378,18 @@ if (file_exists($tv_file_path))
             }
             else
             {
-                // Remove the element and remove it from the sync if successful
-                if ($element->remove())
-                {
-                    $element_sync->remove_element('modTemplateVar', $name);
+                if( !empty($delete_tvs)){
+                    // Remove the element and remove it from the sync if successful
+                    if ($element->remove())
+                    {
+                        $element_sync->remove_element('modTemplateVar', $name);
+                    }
                 }
             }
+
         }
+
     }
+
+
 }
