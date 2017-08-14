@@ -174,6 +174,7 @@ foreach ($element_types as $type => $type_path)
     endif ;
 }
 
+/*
 $log_prefix = '[ElementHelper] modTemplateVar: ';
 $tv_file_path = MODX_BASE_PATH . $modx->getOption('elementhelper.tv_file_path', null, 'site/elements/template_variables.json');
 
@@ -396,3 +397,5 @@ if (file_exists($tv_file_path))
 
 
 }
+*/
+$modx->cacheManager->refresh();
