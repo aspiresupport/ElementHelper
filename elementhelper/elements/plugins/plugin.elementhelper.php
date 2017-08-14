@@ -35,7 +35,8 @@ $element_types = array(
     'modPlugin'   => $modx->getOption('elementhelper.plugin_path', null, 'site/elements/plugins/')
 );
 
-$category_whitelist = array_map('trim', explode(',', $modx->getOption('elementhelper.category_whitelist', null, '')));
+$category_whitelist = $modx->getOption('elementhelper.category_whitelist', null, '');
+if($category_whitelist!=='*') $category_whitelist = array_map('trim', explode(',', $modx->getOption('elementhelper.category_whitelist', null, '')));
 $element_blacklist  = array_map('trim', explode(',', $modx->getOption('elementhelper.element_blacklist', null, '')));
 
 
@@ -132,14 +133,16 @@ foreach ($element_types as $type => $type_path)
             }
 
             // Check if the element has a category and is whitelisted
-            if ($category_id !== 0)
+            // But the whitelist is not set to an asterisk (all categories)
+            if ($category_id !== 0 && $category_whitelist !== '*')
             {
                 $category = Element::get($modx, 'modCategory', $category_id);
 
-                if ( ! in_array($category->get_property('name'), $category_whitelist))
+                if ( ! in_array($category->get_property('name'), $category_whitelist) )
                 {
                     continue;
                 }
+
             }
 
             // If a file with this element name doesn't exist
