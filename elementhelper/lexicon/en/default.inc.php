@@ -13,8 +13,8 @@ $_lang['setting_elementhelper.sync_modTemplate_desc'] = '';
 $_lang['setting_elementhelper.sync_modPlugin'] = 'Sync Plugins';
 $_lang['setting_elementhelper.sync_modPlugin_desc'] = '';
 
-$_lang['setting_elementhelper.sync_modSnippets'] = 'Sync Snippets';
-$_lang['setting_elementhelper.sync_modSnippets_desc'] = '';
+$_lang['setting_elementhelper.sync_modSnippet'] = 'Sync Snippets';
+$_lang['setting_elementhelper.sync_modSnippet_desc'] = '';
 
 
 $_lang['setting_elementhelper.chunk_path'] = 'Chunk Path';
