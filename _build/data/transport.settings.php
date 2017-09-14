@@ -23,7 +23,7 @@ $settings['elementhelper.sync_modTemplate']->fromArray(array(
 $settings['elementhelper.sync_modPlugin'] = $modx->newObject('modSystemSetting');
 $settings['elementhelper.sync_modPlugin']->fromArray(array(
     'key' => 'elementhelper.sync_modPlugin',
-    'value' => '1',
+    'value' => '0',
     'xtype' => 'combo-boolean',
     'namespace' => 'elementhelper',
     'area' => 'config'
@@ -41,7 +41,7 @@ $settings['elementhelper.sync_modSnippet']->fromArray(array(
 $settings['elementhelper.chunk_path'] = $modx->newObject('modSystemSetting');
 $settings['elementhelper.chunk_path']->fromArray(array(
     'key' => 'elementhelper.chunk_path',
-    'value' => 'site/elements/chunks/',
+    'value' => 'elements/chunks/',
     'xtype' => 'textfield',
     'namespace' => 'elementhelper',
     'area' => 'paths'
@@ -50,7 +50,7 @@ $settings['elementhelper.chunk_path']->fromArray(array(
 $settings['elementhelper.template_path'] = $modx->newObject('modSystemSetting');
 $settings['elementhelper.template_path']->fromArray(array(
     'key' => 'elementhelper.template_path',
-    'value' => 'site/elements/templates/',
+    'value' => 'elements/templates/',
     'xtype' => 'textfield',
     'namespace' => 'elementhelper',
     'area' => 'paths'
@@ -59,7 +59,7 @@ $settings['elementhelper.template_path']->fromArray(array(
 $settings['elementhelper.plugin_path'] = $modx->newObject('modSystemSetting');
 $settings['elementhelper.plugin_path']->fromArray(array(
     'key' => 'elementhelper.plugin_path',
-    'value' => 'site/elements/plugins/',
+    'value' => 'elements/plugins/',
     'xtype' => 'textfield',
     'namespace' => 'elementhelper',
     'area' => 'paths'
@@ -68,7 +68,7 @@ $settings['elementhelper.plugin_path']->fromArray(array(
 $settings['elementhelper.snippet_path'] = $modx->newObject('modSystemSetting');
 $settings['elementhelper.snippet_path']->fromArray(array(
     'key' => 'elementhelper.snippet_path',
-    'value' => 'site/elements/snippets/',
+    'value' => 'elements/snippets/',
     'xtype' => 'textfield',
     'namespace' => 'elementhelper',
     'area' => 'paths'
@@ -77,7 +77,7 @@ $settings['elementhelper.snippet_path']->fromArray(array(
 $settings['elementhelper.tv_file_path'] = $modx->newObject('modSystemSetting');
 $settings['elementhelper.tv_file_path']->fromArray(array(
     'key' => 'elementhelper.tv_file_path',
-    'value' => 'site/elements/template_variables.json',
+    'value' => 'elements/template_variables.json',
     'xtype' => 'textfield',
     'namespace' => 'elementhelper',
     'area' => 'paths'
@@ -86,7 +86,7 @@ $settings['elementhelper.tv_file_path']->fromArray(array(
 $settings['elementhelper.element_sync_file_path'] = $modx->newObject('modSystemSetting');
 $settings['elementhelper.element_sync_file_path']->fromArray(array(
     'key' => 'elementhelper.element_sync_file_path',
-    'value' => 'site/elements/element_sync.json',
+    'value' => 'elements/element_sync.json',
     'xtype' => 'textfield',
     'namespace' => 'elementhelper',
     'area' => 'paths'
@@ -113,7 +113,7 @@ $settings['elementhelper.tv_access_control']->fromArray(array(
 $settings['elementhelper.category_whitelist'] = $modx->newObject('modSystemSetting');
 $settings['elementhelper.category_whitelist']->fromArray(array(
     'key' => 'elementhelper.category_whitelist',
-    'value' => '',
+    'value' => '*',
     'xtype' => 'textfield',
     'namespace' => 'elementhelper',
     'area' => 'config'
@@ -122,7 +122,7 @@ $settings['elementhelper.category_whitelist']->fromArray(array(
 $settings['elementhelper.element_blacklist'] = $modx->newObject('modSystemSetting');
 $settings['elementhelper.element_blacklist']->fromArray(array(
     'key' => 'elementhelper.element_blacklist',
-    'value' => 'TinyMCE, Wayfinder, getResources, ClientConfig',
+    'value' => 'TinyMCE, Wayfinder, getResources, ClientConfig,pdoTools,FormIt,pThumb',
     'xtype' => 'textfield',
     'namespace' => 'elementhelper',
     'area' => 'config'
